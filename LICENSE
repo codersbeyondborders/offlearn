@@ -1,0 +1,53 @@
+MIT License
+
+Copyright (c) 2025 Abdul Wajid Parray and Letty Raby - Coders Beyond Borders
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+## Additional Notes for Hackathon Participants
+
+This project was created for the Google Chrome Built-in AI Challenge 2025. 
+We encourage the community to:
+
+🚀 **Use this code** as inspiration for your own AI-powered applications
+📚 **Learn from** the implementation of Chrome's AI APIs
+🔧 **Contribute** improvements, bug fixes, and new features
+🌍 **Share** your modifications and enhancements with the community
+🎓 **Educate** others about offline-first AI applications
+
+### What you can do:
+- ✅ Use this code in your own projects (commercial or non-commercial)
+- ✅ Modify and customize it for your needs
+- ✅ Distribute your modified versions
+- ✅ Include it in other open-source projects
+- ✅ Use it as a starting point for hackathons and competitions
+
+### What we'd appreciate:
+- 🙏 Attribution to the original authors
+- 🔗 A link back to this repository
+- 📢 Sharing your improvements with the community
+- ⭐ A star on the repository if you found it useful
+
+### Built with ❤️ for the developer community
+This project demonstrates the power of Chrome's built-in AI APIs and serves
+as a foundation for building accessible, offline-first AI applications.
+
+Happy coding! 🎉

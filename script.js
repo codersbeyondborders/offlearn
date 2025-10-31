@@ -32,33 +32,6 @@ const LEARNING_SUBJECTS = {
   biology: "Biology"
 };
 
-const LEARNING_MODES = {
-  tutor: { 
-    name: "Tutor", 
-    icon: "🧑‍🏫",
-    prompt: "You are an expert tutor who uses the Socratic method and active learning techniques. Break complex concepts into digestible steps, ask thought-provoking questions, use real-world examples, encourage critical thinking, and be patient and encouraging."
-  },
-  quiz: { 
-    name: "Quiz Master", 
-    icon: "📝",
-    prompt: "You are an engaging quiz master who creates effective assessments. Generate questions that test understanding, provide immediate feedback, explain why answers are correct or incorrect, offer hints for difficult questions, and adapt difficulty based on student responses."
-  },
-  practice: { 
-    name: "Practice Coach", 
-    icon: "💪",
-    prompt: "You are a supportive practice coach focused on skill development. Provide hands-on exercises and real problems to solve, give step-by-step guidance when students are stuck, offer multiple practice problems of increasing difficulty, and connect practice to real-world applications."
-  },
-  review: { 
-    name: "Study Guide", 
-    icon: "📚",
-    prompt: "You are a comprehensive study guide creator who helps consolidate learning. Summarize key concepts in organized, memorable ways, highlight the most important points to remember, show connections between different concepts, and provide memory techniques and mnemonics."
-  },
-  flashcard: { 
-    name: "Flashcard Maker", 
-    icon: "🗂️",
-    prompt: "You are a flashcard creation expert who makes effective study cards. Create concise, focused question-answer pairs, use active recall principles, include visual descriptions when helpful, and make cards that test understanding, not just facts."
-  }
-};
 
 const LEVEL_PROMPTS = {
   beginner: "Adapt your teaching for beginners by using simple, clear language without jargon, providing basic examples from everyday life, explaining fundamental concepts step-by-step, being extra patient and encouraging, and checking understanding frequently.",
@@ -82,6 +55,9 @@ const SUBJECT_CONTEXTS = {
   // Global state
   let currentMode = 'main';
   let session = null;
+  let summarizer = null;
+  let writer = null;
+  let rewriter = null;
   let learningState = {
     subject: 'general',
     level: 'beginner', 
@@ -127,6 +103,26 @@ const SUBJECT_CONTEXTS = {
   const textInput = document.getElementById("text-input");
   const writingInput = document.getElementById("writing-input");
 
+  // DOM Elements - Summarizer Controls
+  const summaryType = document.getElementById("summary-type");
+  const summaryLength = document.getElementById("summary-length");
+  const summaryFormat = document.getElementById("summary-format");
+  const sharedContext = document.getElementById("shared-context");
+  const summarizerStatus = document.getElementById("summarizer-status");
+  const summarizerProgress = document.getElementById("summarizer-progress");
+  const summarizerProgressText = document.getElementById("summarizer-progress-text");
+
+  // DOM Elements - Writer Controls
+  const writingMode = document.getElementById("writing-mode");
+  const writingTone = document.getElementById("writing-tone");
+  const writingLength = document.getElementById("writing-length");
+  const writingFormat = document.getElementById("writing-format");
+  const writingContext = document.getElementById("writing-context");
+  const writerStatus = document.getElementById("writer-status");
+  const writerProgress = document.getElementById("writer-progress");
+  const writerProgressText = document.getElementById("writer-progress-text");
+  const writingFormHeading = document.getElementById("writing-form-heading");
+
   // DOM Elements - Output Areas
   const responseArea = document.getElementById("response-area");
   const summaryArea = document.getElementById("summary-area");
@@ -143,20 +139,32 @@ const SUBJECT_CONTEXTS = {
   const focusArea = document.getElementById("focus-area");
 
   // Check AI availability
-  if (!('LanguageModel' in self)) {
-    const errorMessage = document.getElementById("error-message");
-    errorMessage.style.display = "block";
-    errorMessage.innerHTML = `
-      <h3>🚫 AI Not Available</h3>
-      <p>Your browser doesn't support the Prompt API. To use this app:</p>
-      <ol>
-        <li>Use Chrome Dev/Canary (128+)</li>
-        <li>Join the <a href="https://goo.gle/chrome-ai-dev-preview-join">Early Preview Program</a></li>
-        <li>Enable and download the on-device AI model in Chrome Settings</li>
-      </ol>
-    `;
-    return;
-  }
+  const checkAIAvailability = () => {
+    const hasPromptAPI = 'LanguageModel' in self;
+    const hasSummarizerAPI = 'Summarizer' in self;
+    const hasWriterAPI = 'Writer' in self;
+    const hasRewriterAPI = 'Rewriter' in self;
+    
+    if (!hasPromptAPI && !hasSummarizerAPI && !hasWriterAPI && !hasRewriterAPI) {
+      const errorMessage = document.getElementById("error-message");
+      errorMessage.style.display = "block";
+      errorMessage.innerHTML = `
+        <h3>🚫 AI Not Available</h3>
+        <p>Your browser doesn't support the AI APIs. To use this app:</p>
+        <ol>
+          <li>Use Chrome Dev/Canary (128+)</li>
+          <li>Join the <a href="https://goo.gle/chrome-ai-dev-preview-join">Early Preview Program</a></li>
+          <li>Enable and download the on-device AI model in Chrome Settings</li>
+        </ol>
+      `;
+      return false;
+    }
+    
+    return { hasPromptAPI, hasSummarizerAPI, hasWriterAPI, hasRewriterAPI };
+  };
+
+  const aiAvailability = checkAIAvailability();
+  if (!aiAvailability) return;
 
   // Navigation Functions
   const showPanel = (panelName) => {
@@ -165,6 +173,10 @@ const SUBJECT_CONTEXTS = {
     tutorPanel.style.display = "none";
     summarizerPanel.style.display = "none";
     writerPanel.style.display = "none";
+
+    // Hide any status indicators
+    summarizerStatus.style.display = "none";
+    writerStatus.style.display = "none";
 
     // Show selected panel
     switch(panelName) {
@@ -179,6 +191,7 @@ const SUBJECT_CONTEXTS = {
       case 'writer':
         writerPanel.style.display = "block";
         currentMode = 'writer';
+        updateWritingModeUI(); // Update UI when entering writer panel
         break;
       default:
         mainScreen.style.display = "block";
@@ -338,6 +351,326 @@ const SUBJECT_CONTEXTS = {
     }
   };
 
+  // Summarizer Management
+  const createSummarizer = async () => {
+    if (!aiAvailability.hasSummarizerAPI) {
+      throw new Error("Summarizer API not available");
+    }
+
+    // Check availability first
+    const availability = await Summarizer.availability();
+    if (availability === 'unavailable') {
+      throw new Error("Summarizer is not available on this device");
+    }
+
+    // Show progress if downloading
+    if (availability === 'downloadable') {
+      summarizerStatus.style.display = "block";
+      summarizerStatus.querySelector('.status-message').textContent = "Downloading Summarizer model...";
+    }
+
+    // Check for user activation
+    if (!navigator.userActivation.isActive) {
+      throw new Error("User activation required to create summarizer");
+    }
+
+    try {
+      const options = {
+        type: summaryType?.value || 'key-points',
+        format: summaryFormat?.value || 'markdown',
+        length: summaryLength?.value || 'medium',
+        monitor(m) {
+          m.addEventListener('downloadprogress', (e) => {
+            const progress = Math.round(e.loaded * 100);
+            summarizerProgress.style.width = `${progress}%`;
+            summarizerProgressText.textContent = `${progress}%`;
+            console.log(`Summarizer downloaded ${progress}%`);
+          });
+        }
+      };
+
+      // Add shared context if provided
+      const contextValue = sharedContext?.value?.trim();
+      if (contextValue) {
+        options.sharedContext = contextValue;
+      }
+
+      summarizer = await Summarizer.create(options);
+      
+      // Hide progress indicator
+      summarizerStatus.style.display = "none";
+      
+      const offlineStatus = document.getElementById("offline-status");
+      if (offlineStatus) {
+        offlineStatus.textContent = "🟢 Offline Ready";
+      }
+    } catch (error) {
+      summarizerStatus.style.display = "none";
+      throw error;
+    }
+  };
+
+  // Writer Management
+  const createWriter = async () => {
+    if (!aiAvailability.hasWriterAPI) {
+      throw new Error("Writer API not available");
+    }
+
+    // Check availability first
+    const availability = await Writer.availability();
+    if (availability === 'unavailable') {
+      throw new Error("Writer is not available on this device");
+    }
+
+    // Show progress if downloading
+    if (availability === 'downloadable') {
+      writerStatus.style.display = "block";
+      writerStatus.querySelector('.status-message').textContent = "Downloading Writer model...";
+    }
+
+    // Check for user activation
+    if (!navigator.userActivation.isActive) {
+      throw new Error("User activation required to create writer");
+    }
+
+    try {
+      const options = {
+        tone: getWriterTone(),
+        format: writingFormat?.value || 'markdown',
+        length: getWriterLength(),
+        monitor(m) {
+          m.addEventListener('downloadprogress', (e) => {
+            const progress = Math.round(e.loaded * 100);
+            writerProgress.style.width = `${progress}%`;
+            writerProgressText.textContent = `${progress}%`;
+            console.log(`Writer downloaded ${progress}%`);
+          });
+        }
+      };
+
+      // Add shared context if provided
+      const contextValue = writingContext?.value?.trim();
+      if (contextValue) {
+        options.sharedContext = contextValue;
+      }
+
+      writer = await Writer.create(options);
+      
+      // Hide progress indicator
+      writerStatus.style.display = "none";
+      
+      const offlineStatus = document.getElementById("offline-status");
+      if (offlineStatus) {
+        offlineStatus.textContent = "🟢 Offline Ready";
+      }
+    } catch (error) {
+      writerStatus.style.display = "none";
+      throw error;
+    }
+  };
+
+  // Rewriter Management
+  const createRewriter = async () => {
+    if (!aiAvailability.hasRewriterAPI) {
+      throw new Error("Rewriter API not available");
+    }
+
+    // Check availability first
+    const availability = await Rewriter.availability();
+    if (availability === 'unavailable') {
+      throw new Error("Rewriter is not available on this device");
+    }
+
+    // Show progress if downloading
+    if (availability === 'downloadable') {
+      writerStatus.style.display = "block";
+      writerStatus.querySelector('.status-message').textContent = "Downloading Rewriter model...";
+    }
+
+    // Check for user activation
+    if (!navigator.userActivation.isActive) {
+      throw new Error("User activation required to create rewriter");
+    }
+
+    try {
+      const options = {
+        tone: getRewriterTone(),
+        format: writingFormat?.value || 'as-is',
+        length: getRewriterLength(),
+        monitor(m) {
+          m.addEventListener('downloadprogress', (e) => {
+            const progress = Math.round(e.loaded * 100);
+            writerProgress.style.width = `${progress}%`;
+            writerProgressText.textContent = `${progress}%`;
+            console.log(`Rewriter downloaded ${progress}%`);
+          });
+        }
+      };
+
+      // Add shared context if provided
+      const contextValue = writingContext?.value?.trim();
+      if (contextValue) {
+        options.sharedContext = contextValue;
+      }
+
+      rewriter = await Rewriter.create(options);
+      
+      // Hide progress indicator
+      writerStatus.style.display = "none";
+      
+      const offlineStatus = document.getElementById("offline-status");
+      if (offlineStatus) {
+        offlineStatus.textContent = "🟢 Offline Ready";
+      }
+    } catch (error) {
+      writerStatus.style.display = "none";
+      throw error;
+    }
+  };
+
+  // Helper functions for Writer/Rewriter options
+  const getWriterTone = () => {
+    const tone = writingTone?.value || 'neutral';
+    // Map to Writer API values
+    if (tone === 'more-formal' || tone === 'more-casual' || tone === 'as-is') {
+      return 'neutral'; // Writer API doesn't support these, use neutral
+    }
+    return tone;
+  };
+
+  const getRewriterTone = () => {
+    const tone = writingTone?.value || 'as-is';
+    // Map to Rewriter API values
+    if (tone === 'formal') return 'more-formal';
+    if (tone === 'casual') return 'more-casual';
+    return tone;
+  };
+
+  const getWriterLength = () => {
+    const length = writingLength?.value || 'short';
+    // Map to Writer API values
+    if (length === 'as-is' || length === 'shorter' || length === 'longer') {
+      return 'short'; // Writer API doesn't support these, use short
+    }
+    return length;
+  };
+
+  const getRewriterLength = () => {
+    const length = writingLength?.value || 'as-is';
+    // Map to Rewriter API values
+    if (length === 'short') return 'shorter';
+    if (length === 'medium') return 'as-is';
+    if (length === 'long') return 'longer';
+    return length;
+  };
+
+  // Update UI based on writing mode
+  const updateWritingModeUI = () => {
+    const mode = writingMode?.value || 'write';
+    
+    // Update form heading and placeholder
+    if (writingFormHeading && writingInput) {
+      switch(mode) {
+        case 'write':
+          writingFormHeading.textContent = "Describe what you want to write";
+          writingInput.placeholder = "e.g., 'Write an email to my team about the project update'";
+          break;
+        case 'rewrite':
+          writingFormHeading.textContent = "Paste text to rewrite and improve";
+          writingInput.placeholder = "Paste your existing text here to rewrite and improve it...";
+          break;
+        case 'proofread':
+          writingFormHeading.textContent = "Paste text to proofread and fix";
+          writingInput.placeholder = "Paste your text here to check for grammar, spelling, and style errors...";
+          break;
+      }
+    }
+
+    // Update tone options based on mode
+    if (writingTone) {
+      const currentValue = writingTone.value;
+      writingTone.innerHTML = '';
+      
+      if (mode === 'write') {
+        // Writer API tone options
+        writingTone.innerHTML = `
+          <option value="neutral" ${currentValue === 'neutral' ? 'selected' : ''}>Neutral</option>
+          <option value="formal" ${currentValue === 'formal' ? 'selected' : ''}>Formal</option>
+          <option value="casual" ${currentValue === 'casual' ? 'selected' : ''}>Casual</option>
+        `;
+      } else if (mode === 'rewrite') {
+        // Rewriter API tone options
+        writingTone.innerHTML = `
+          <option value="as-is" ${currentValue === 'as-is' ? 'selected' : ''}>As-Is</option>
+          <option value="more-formal" ${currentValue === 'more-formal' ? 'selected' : ''}>More Formal</option>
+          <option value="more-casual" ${currentValue === 'more-casual' ? 'selected' : ''}>More Casual</option>
+        `;
+      } else {
+        // Proofreading mode - tone doesn't apply
+        writingTone.innerHTML = `
+          <option value="as-is" selected>Preserve Original</option>
+        `;
+      }
+    }
+
+    // Update length options based on mode
+    if (writingLength) {
+      const currentValue = writingLength.value;
+      writingLength.innerHTML = '';
+      
+      if (mode === 'write') {
+        // Writer API length options
+        writingLength.innerHTML = `
+          <option value="short" ${currentValue === 'short' ? 'selected' : ''}>Short</option>
+          <option value="medium" ${currentValue === 'medium' ? 'selected' : ''}>Medium</option>
+          <option value="long" ${currentValue === 'long' ? 'selected' : ''}>Long</option>
+        `;
+      } else if (mode === 'rewrite') {
+        // Rewriter API length options
+        writingLength.innerHTML = `
+          <option value="as-is" ${currentValue === 'as-is' ? 'selected' : ''}>As-Is</option>
+          <option value="shorter" ${currentValue === 'shorter' ? 'selected' : ''}>Shorter</option>
+          <option value="longer" ${currentValue === 'longer' ? 'selected' : ''}>Longer</option>
+        `;
+      } else {
+        // Proofreading mode - length doesn't apply
+        writingLength.innerHTML = `
+          <option value="as-is" selected>Preserve Length</option>
+        `;
+      }
+    }
+
+    // Update format options based on mode
+    if (writingFormat) {
+      const currentValue = writingFormat.value;
+      writingFormat.innerHTML = '';
+      
+      if (mode === 'write') {
+        // Writer API format options
+        writingFormat.innerHTML = `
+          <option value="markdown" ${currentValue === 'markdown' ? 'selected' : ''}>Markdown</option>
+          <option value="plain-text" ${currentValue === 'plain-text' ? 'selected' : ''}>Plain Text</option>
+        `;
+      } else if (mode === 'rewrite') {
+        // Rewriter API format options
+        writingFormat.innerHTML = `
+          <option value="as-is" ${currentValue === 'as-is' ? 'selected' : ''}>As-Is</option>
+          <option value="markdown" ${currentValue === 'markdown' ? 'selected' : ''}>Markdown</option>
+          <option value="plain-text" ${currentValue === 'plain-text' ? 'selected' : ''}>Plain Text</option>
+        `;
+      } else {
+        // Proofreading mode - preserve format
+        writingFormat.innerHTML = `
+          <option value="as-is" selected>Preserve Format</option>
+        `;
+      }
+    }
+
+    // Reset writer/rewriter instances when mode changes
+    writer = null;
+    rewriter = null;
+  };
+
   // Tutor Functions
   const handleTutorSubmit = async (e) => {
     e.preventDefault();
@@ -426,58 +759,45 @@ const SUBJECT_CONTEXTS = {
     setButtonLoading(submitButton, true);
 
     try {
-      if (!session) {
-        await createSession('summarizer');
-      }
-
-      const summaryLength = document.getElementById("summary-length").value;
-      const summaryStyle = document.getElementById("summary-style").value;
-
-      let prompt = `Please summarize the following text. `;
-      
-      switch(summaryLength) {
-        case 'brief':
-          prompt += `Keep it very brief (2-3 sentences). `;
-          break;
-        case 'medium':
-          prompt += `Provide a medium-length summary (1 paragraph). `;
-          break;
-        case 'detailed':
-          prompt += `Provide a detailed summary with multiple paragraphs. `;
-          break;
-      }
-
-      switch(summaryStyle) {
-        case 'bullet':
-          prompt += `Format as bullet points. `;
-          break;
-        case 'outline':
-          prompt += `Format as an outline with main points and sub-points. `;
-          break;
-        default:
-          prompt += `Format as clear paragraphs. `;
-      }
-
-      prompt += `\n\nText to summarize:\n${text}`;
+      // Create or recreate summarizer with current settings
+      await createSummarizer();
 
       // Show summary section
       summarySection.style.display = "block";
       summaryArea.innerHTML = "Generating summary...";
 
-      const stream = await session.promptStreaming(prompt);
+      // Prepare context if provided
+      const contextOptions = {};
+      const contextValue = sharedContext?.value?.trim();
+      if (contextValue) {
+        contextOptions.context = contextValue;
+      }
+
+      // Use streaming summarization
+      const stream = summarizer.summarizeStreaming(text, contextOptions);
       let result = '';
-      let previousChunk = '';
       
       for await (const chunk of stream) {
-        const newChunk = chunk.startsWith(previousChunk) 
-          ? chunk.slice(previousChunk.length) : chunk;
-        result += newChunk;
-        summaryArea.innerHTML = DOMPurify.sanitize(marked.parse(result));
-        previousChunk = chunk;
+        result = chunk; // Summarizer API returns complete chunks, not incremental
+        
+        // Format based on selected format
+        if (summaryFormat?.value === 'markdown') {
+          summaryArea.innerHTML = DOMPurify.sanitize(marked.parse(result));
+        } else {
+          summaryArea.innerHTML = DOMPurify.sanitize(result.replace(/\n/g, '<br>'));
+        }
       }
       
     } catch (error) {
+      console.error("Summarizer error:", error);
       summaryArea.innerHTML = `<div class="error-message">❌ Error: ${error.message}</div>`;
+      
+      // Show helpful error messages
+      if (error.message.includes('not available')) {
+        summaryArea.innerHTML += `<p>The Summarizer API is not available. Please ensure you're using Chrome Dev/Canary with AI features enabled.</p>`;
+      } else if (error.message.includes('User activation')) {
+        summaryArea.innerHTML += `<p>Please click the button again to activate the summarizer.</p>`;
+      }
     } finally {
       // Remove loading state
       setButtonLoading(submitButton, false);
@@ -491,59 +811,101 @@ const SUBJECT_CONTEXTS = {
     if (!text) return;
 
     const submitButton = document.getElementById("writing-button");
+    const mode = writingMode?.value || 'write';
     
     // Set loading state
     setButtonLoading(submitButton, true);
 
     try {
-      if (!session) {
-        await createSession('writer');
-      }
-
-      const writingTask = document.getElementById("writing-task").value;
-      const writingType = document.getElementById("writing-type").value;
-
-      let prompt = ``;
-      
-      switch(writingTask) {
-        case 'improve':
-          prompt = `Please improve the following text for clarity, flow, and engagement: `;
-          break;
-        case 'grammar':
-          prompt = `Please check and correct any grammar, spelling, or punctuation errors in the following text: `;
-          break;
-        case 'style':
-          prompt = `Please enhance the style and tone of the following text to make it more engaging: `;
-          break;
-        case 'ideas':
-          prompt = `Please help generate ideas and expand on the following writing prompt or topic: `;
-          break;
-        case 'structure':
-          prompt = `Please help organize and structure the following text for better flow and clarity: `;
-          break;
-      }
-
-      prompt += `Consider this is ${writingType} writing. `;
-      prompt += `\n\nText:\n${text}`;
-
       // Show writing section
       writingSection.style.display = "block";
-      writingArea.innerHTML = "Analyzing your writing...";
+      writingArea.innerHTML = "Processing your request...";
 
-      const stream = await session.promptStreaming(prompt);
       let result = '';
-      let previousChunk = '';
       
-      for await (const chunk of stream) {
-        const newChunk = chunk.startsWith(previousChunk) 
-          ? chunk.slice(previousChunk.length) : chunk;
-        result += newChunk;
-        writingArea.innerHTML = DOMPurify.sanitize(marked.parse(result));
-        previousChunk = chunk;
+      if (mode === 'write') {
+        // Use Writer API for new content generation
+        await createWriter();
+        
+        // Prepare context if provided
+        const contextOptions = {};
+        const contextValue = writingContext?.value?.trim();
+        if (contextValue) {
+          contextOptions.context = contextValue;
+        }
+
+        // Use streaming writing
+        const stream = writer.writeStreaming(text, contextOptions);
+        
+        for await (const chunk of stream) {
+          result = chunk; // Writer API returns complete chunks
+          
+          // Format based on selected format
+          if (writingFormat?.value === 'markdown') {
+            writingArea.innerHTML = DOMPurify.sanitize(marked.parse(result));
+          } else {
+            writingArea.innerHTML = DOMPurify.sanitize(result.replace(/\n/g, '<br>'));
+          }
+        }
+        
+      } else if (mode === 'rewrite') {
+        // Use Rewriter API for text improvement
+        await createRewriter();
+        
+        // Prepare context if provided
+        const contextOptions = {};
+        const contextValue = writingContext?.value?.trim();
+        if (contextValue) {
+          contextOptions.context = contextValue;
+        }
+
+        // Use streaming rewriting
+        const stream = rewriter.rewriteStreaming(text, contextOptions);
+        
+        for await (const chunk of stream) {
+          result = chunk; // Rewriter API returns complete chunks
+          
+          // Format based on selected format
+          if (writingFormat?.value === 'markdown') {
+            writingArea.innerHTML = DOMPurify.sanitize(marked.parse(result));
+          } else if (writingFormat?.value === 'plain-text') {
+            writingArea.innerHTML = DOMPurify.sanitize(result.replace(/\n/g, '<br>'));
+          } else {
+            // as-is format
+            writingArea.innerHTML = DOMPurify.sanitize(result.replace(/\n/g, '<br>'));
+          }
+        }
+        
+      } else if (mode === 'proofread') {
+        // Use Prompt API for proofreading (fallback until Proofreader API is available)
+        if (!session) {
+          await createSession('writer');
+        }
+
+        const prompt = `Please proofread and correct any grammar, spelling, punctuation, and style errors in the following text. Maintain the original meaning and tone:\n\n${text}`;
+        
+        const stream = await session.promptStreaming(prompt);
+        let previousChunk = '';
+        
+        for await (const chunk of stream) {
+          const newChunk = chunk.startsWith(previousChunk) 
+            ? chunk.slice(previousChunk.length) : chunk;
+          result += newChunk;
+          writingArea.innerHTML = DOMPurify.sanitize(marked.parse(result));
+          previousChunk = chunk;
+        }
       }
       
     } catch (error) {
+      console.error("Writer error:", error);
       writingArea.innerHTML = `<div class="error-message">❌ Error: ${error.message}</div>`;
+      
+      // Show helpful error messages
+      if (error.message.includes('not available')) {
+        writingArea.innerHTML += `<p>The ${mode === 'write' ? 'Writer' : 'Rewriter'} API is not available. Please ensure you're using Chrome Dev/Canary with AI features enabled.</p>`;
+      } else if (error.message.includes('User activation')) {
+        writingArea.innerHTML += `<p>Please click the button again to activate the ${mode === 'write' ? 'writer' : 'rewriter'}.</p>`;
+      }
     } finally {
       // Remove loading state
       setButtonLoading(submitButton, false);
@@ -595,6 +957,66 @@ const SUBJECT_CONTEXTS = {
     }
   });
 
+  // Event Listeners - Summarizer Settings Changes (recreate summarizer with new options)
+  summaryType?.addEventListener("change", () => {
+    if (currentMode === 'summarizer' && summarizer) {
+      summarizer = null; // Will be recreated on next use
+    }
+  });
+
+  summaryLength?.addEventListener("change", () => {
+    if (currentMode === 'summarizer' && summarizer) {
+      summarizer = null; // Will be recreated on next use
+    }
+  });
+
+  summaryFormat?.addEventListener("change", () => {
+    if (currentMode === 'summarizer' && summarizer) {
+      summarizer = null; // Will be recreated on next use
+    }
+  });
+
+  sharedContext?.addEventListener("input", () => {
+    if (currentMode === 'summarizer' && summarizer) {
+      summarizer = null; // Will be recreated on next use
+    }
+  });
+
+  // Event Listeners - Writer Settings Changes
+  writingMode?.addEventListener("change", () => {
+    updateWritingModeUI();
+    writer = null;
+    rewriter = null;
+  });
+
+  writingTone?.addEventListener("change", () => {
+    if (currentMode === 'writer') {
+      writer = null;
+      rewriter = null;
+    }
+  });
+
+  writingLength?.addEventListener("change", () => {
+    if (currentMode === 'writer') {
+      writer = null;
+      rewriter = null;
+    }
+  });
+
+  writingFormat?.addEventListener("change", () => {
+    if (currentMode === 'writer') {
+      writer = null;
+      rewriter = null;
+    }
+  });
+
+  writingContext?.addEventListener("input", () => {
+    if (currentMode === 'writer') {
+      writer = null;
+      rewriter = null;
+    }
+  });
+
   // Event Listeners - Temperature Change
   document.getElementById("session-temperature")?.addEventListener("input", () => {
     if (session) {
@@ -637,12 +1059,17 @@ const SUBJECT_CONTEXTS = {
   document.getElementById("new-summary-button")?.addEventListener("click", () => {
     textInput.value = "";
     summarySection.style.display = "none";
+    summarizerStatus.style.display = "none";
+    summarizer = null; // Reset summarizer for fresh start
     textInput.focus();
   });
 
   document.getElementById("new-writing-button")?.addEventListener("click", () => {
     writingInput.value = "";
     writingSection.style.display = "none";
+    writerStatus.style.display = "none";
+    writer = null;
+    rewriter = null;
     writingInput.focus();
   });
 
