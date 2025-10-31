@@ -146,7 +146,6 @@ header p {
 /* Main interaction area with prompt and stats in one row */
 #main-interaction-area {
   display: grid;
-  grid-template-columns: 2fr 1fr;
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
@@ -354,6 +353,8 @@ textarea:focus {
   margin-top: 1rem;
   flex-wrap: wrap;
   align-items: center;
+  border-top: 1px solid #525252;
+  padding: 1rem;
 }
 
 .advanced-options {
@@ -424,6 +425,8 @@ button:hover {
 #new-lesson-button {
   background: var(--accent-color);
   color: white;
+  text-align: center;
+  margin: auto;
 }
 
 #new-lesson-button:hover {
@@ -510,6 +513,11 @@ footer a:hover {
   .learning-stats {
     background: #2d2d2d;
     color: var(--text-dark);
+  }
+
+  span.form-heading{
+    color: #FFF;
+    margin-bottom: 10px;
   }
   
   .control-group select,
@@ -1099,6 +1107,10 @@ nced Focus Management */
   font-weight: 500;
 }
 
+h1#back-to-home{
+  cursor: pointer;
+}
+
 .back-btn:hover, .help-btn:hover {
   background: rgba(255, 255, 255, 0.3);
   transform: translateY(-1px);
@@ -1453,4 +1465,157 @@ Message Styles for Tutor Panel */
   .settings {
     background: #333;
   }
+}/* Heade
+r buttons group styling */
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Advanced options in header */
+.panel-header .advanced-options {
+  margin: 0;
+}
+
+.panel-header .advanced-options summary {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.panel-header .advanced-options summary:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.panel-header .advanced-options[open] summary {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.panel-header .settings {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: white;
+  color: #333;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  z-index: 1000;
+  min-width: 300px;
+  padding: 1rem;
+}
+
+.panel-header .advanced-options {
+  position: relative;
+}
+
+/* Responsive header for mobile */
+@media (max-width: 768px) {
+  .panel-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .panel-header h2 {
+    order: -1;
+  }
+  
+  .header-buttons {
+    justify-content: center;
+  }
+  
+  .panel-header .settings {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    right: auto;
+    width: 90%;
+    max-width: 400px;
+  }
+}
+
+/* Dark mode for header settings */
+@media (prefers-color-scheme: dark) {
+  .panel-header .settings {
+    background: #2d2d2d;
+    color: var(--text-dark);
+  }
+  
+  .panel-header .settings input,
+  .panel-header .settings select {
+    background: #444;
+    color: white;
+    border-color: #555;
+  }
+}/* Lo
+ading Spinner Styles */
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 0.5rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Button loading state */
+button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+button:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Prevent button text selection during loading */
+button[disabled] {
+  user-select: none;
+  pointer-events: none;
+}
+
+button[disabled]:not(:hover) {
+  transform: none;
+}
+
+/* Dark mode spinner */
+@media (prefers-color-scheme: dark) {
+  .spinner {
+    border-color: rgba(255, 255, 255, 0.2);
+    border-top-color: rgba(255, 255, 255, 0.8);
+  }
+}
+
+/* Loading state for different button types */
+.option-btn:disabled .spinner {
+  border-color: rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+}
+
+.back-btn:disabled .spinner,
+.help-btn:disabled .spinner {
+  border-color: rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+}
+
+/* Ensure spinner is visible in all button contexts */
+button .spinner {
+  vertical-align: middle;
 }
