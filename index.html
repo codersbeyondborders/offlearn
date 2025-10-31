@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <meta http-equiv="origin-trial"
+    content="AoXwZGsUZlGEyuueX5nR6tujynrCfWhNWQnZcHTy3AZkXtCMULt/UJs6+/1Bp5jVw7Ue96Tcyf1IO8IRUMimAgcAAABeeyJvcmlnaW4iOiJodHRwczovL2Nocm9tZS5kZXY6NDQzIiwiZmVhdHVyZSI6IkFJUHJvbXB0QVBJTXVsdGltb2RhbElucHV0IiwiZXhwaXJ5IjoxNzc0MzEwNDAwfQ==">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
+  <link rel="stylesheet" href="style.css">
+  <title>Offline Learning Hub</title>
+  <script>
+    if (!isSecureContext) location.protocol = "https:";
+  </script>
+  <script src="script.js" type="module"></script>
+</head>
+
+<body>
+  <header>
+    <h1>📚 Offline Learning Hub</h1>
+    <p>Your personal AI tutor powered by Chrome's built-in Gemini Nano - works completely offline!</p>
+    <div class="status-bar">
+      <span id="offline-status">🟢 Offline Ready</span>
+      <span id="session-info">Session: Ready</span>
+    </div>
+  </header>
+  <div id="error-message"></div>
+
+  <div id="learning-setup">
+    <div class="learning-controls">
+      <div class="control-group">
+        <label for="subject-select">Subject</label>
+        <select id="subject-select">
+          <option value="general">General Learning</option>
+          <option value="math">Mathematics</option>
+          <option value="science">Science</option>
+          <option value="language">Language Arts</option>
+          <option value="history">History</option>
+          <option value="programming">Programming</option>
+          <option value="physics">Physics</option>
+          <option value="chemistry">Chemistry</option>
+          <option value="biology">Biology</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="level-select">Level</label>
+        <select id="level-select">
+          <option value="beginner">Beginner</option>
+          <option value="intermediate">Intermediate</option>
+          <option value="advanced">Advanced</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="mode-select">Learning Mode</label>
+        <select id="mode-select">
+          <option value="tutor">🧑‍🏫 Tutor (Explain)</option>
+          <option value="quiz">📝 Quiz Me</option>
+          <option value="practice">💪 Practice Problems</option>
+          <option value="review">📚 Review & Summary</option>
+          <option value="flashcard">🗂️ Create Flashcards</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="focus-area">Focus Area (Optional)</label>
+        <input type="text" id="focus-area" placeholder="e.g., algebra, grammar, photosynthesis">
+      </div>
+    </div>
+  </div>
+
+  <div id="main-interaction-area">
+    <div id="prompt-area">
+      <form>
+        <label>
+          Ask your question or describe what you'd like to learn
+          <textarea id="prompt-input"
+            placeholder="e.g., 'Explain photosynthesis' or 'Give me algebra practice problems'"></textarea>
+        </label>
+        <div class="button-group">
+          <button type="submit" id="submit-button">Ask Tutor</button>
+        </div>
+        <span id="cost" style="display: none;"></span>
+      </form>
+    </div>
+
+    <div class="learning-stats">
+      <h3>Learning Session</h3>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-label">Subject:</span>
+          <span id="current-subject">General</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Level:</span>
+          <span id="current-level">Beginner</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Mode:</span>
+          <span id="current-mode">Tutor</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Questions:</span>
+          <span id="question-count">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Study Time:</span>
+          <span id="study-time">0m</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Streak:</span>
+          <span id="learning-streak">0 days</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="conversation-section">
+    <h2>Learning Conversation</h2>
+    <div id="response-area"></div>
+    <div class="learning-tools">
+      <button id="help-button">❓ Help</button>
+      <button id="new-lesson-button">🆕 New Lesson</button>
+      <button id="copy-notes-button">📋 Copy Notes</button>
+      <details class="advanced-options">
+        <summary>⚙️ Advanced Options</summary>
+        <div class="settings">
+          <label for="session-temperature">AI Creativity</label>
+          <input id="session-temperature" type="range" min="0" max="2" step="0.1" value="0.7">
+          <span id="temp-value">0.7</span>
+          <label for="response-length">Response Length</label>
+          <select id="response-length">
+            <option value="concise">Concise</option>
+            <option value="detailed" selected>Detailed</option>
+            <option value="comprehensive">Comprehensive</option>
+          </select>
+        </div>
+      </details>
+    </div>
+
+
+
+    <div id="problematic-area">
+      <h3>Issue Report:</h3>
+      <pre id="problem"></pre>
+    </div>
+  </div>
+
+  <!-- Welcome Modal -->
+  <div id="welcome-modal" class="modal welcome-modal">
+    <div class="modal-content welcome-content">
+      <span class="close" id="welcome-close">&times;</span>
+      <div class="welcome-header">
+        <h2>👋 Welcome to Learning Hub</h2>
+      </div>
+      <div class="welcome-body">
+        <h3>Ready to learn? Here's how to get started:</h3>
+        <ul>
+          <li>🎯 <strong>Choose your subject and level</strong> above</li>
+          <li>💡 <strong>Use the learning controls</strong> to customize your experience</li>
+          <li>❓ <strong>Ask any question</strong> - I'll adapt to your learning style</li>
+          <li>📚 <strong>Try different modes</strong> - Tutor, Quiz, Practice, or Review</li>
+          <li>🗂️ <strong>Create flashcards</strong> and bookmark important conversations</li>
+        </ul>
+        <p><em>Everything works offline once set up - perfect for studying anywhere! 🌍</em></p>
+        <div class="welcome-actions">
+          <button id="welcome-start-button" class="welcome-btn">Let's Start Learning!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirm-modal" class="modal confirm-modal">
+    <div class="modal-content confirm-content">
+      <div class="confirm-header">
+        <h3 id="confirm-title">Confirm Action</h3>
+      </div>
+      <div class="confirm-body">
+        <p id="confirm-message">Are you sure you want to proceed?</p>
+      </div>
+      <div class="confirm-actions">
+        <button id="confirm-cancel" class="confirm-btn cancel-btn">Cancel</button>
+        <button id="confirm-ok" class="confirm-btn ok-btn">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alert Modal -->
+  <div id="alert-modal" class="modal alert-modal">
+    <div class="modal-content alert-content">
+      <div class="alert-header">
+        <h3 id="alert-title">Notice</h3>
+      </div>
+      <div class="alert-body">
+        <p id="alert-message">This is an alert message.</p>
+      </div>
+      <div class="alert-actions">
+        <button id="alert-ok" class="alert-btn ok-btn">OK</button>
+      </div>
+    </div>
+  </div>
+  
+
+
+  <footer></footer>
+  Made by
+  <a href="https://github.com/codersbeyondborders">Coders Beyond Borders</a>. Source code on
+  <a href="https://github.com/codersbeyondborders">GitHub</a>.
+  </footer>
+</body>
+
+</html>
