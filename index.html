@@ -28,146 +28,333 @@
   </header>
   <div id="error-message"></div>
 
-  <div id="learning-setup">
-    <div class="learning-controls">
-      <div class="control-group">
-        <label for="subject-select">Subject</label>
-        <select id="subject-select">
-          <option value="general">General Learning</option>
-          <option value="math">Mathematics</option>
-          <option value="science">Science</option>
-          <option value="language">Language Arts</option>
-          <option value="history">History</option>
-          <option value="programming">Programming</option>
-          <option value="physics">Physics</option>
-          <option value="chemistry">Chemistry</option>
-          <option value="biology">Biology</option>
-        </select>
-      </div>
-
-      <div class="control-group">
-        <label for="level-select">Level</label>
-        <select id="level-select">
-          <option value="beginner">Beginner</option>
-          <option value="intermediate">Intermediate</option>
-          <option value="advanced">Advanced</option>
-        </select>
-      </div>
-
-      <div class="control-group">
-        <label for="mode-select">Learning Mode</label>
-        <select id="mode-select">
-          <option value="tutor">🧑‍🏫 Tutor (Explain)</option>
-          <option value="quiz">📝 Quiz Me</option>
-          <option value="practice">💪 Practice Problems</option>
-          <option value="review">📚 Review & Summary</option>
-          <option value="flashcard">🗂️ Create Flashcards</option>
-        </select>
-      </div>
-
-      <div class="control-group">
-        <label for="focus-area">Focus Area (Optional)</label>
-        <input type="text" id="focus-area" placeholder="e.g., algebra, grammar, photosynthesis">
+  <!-- Main Screen with Three Options -->
+  <div id="main-screen">
+    <div class="main-options">
+      <h2>Choose Your AI Assistant</h2>
+      <div class="option-cards">
+        <div class="option-card" id="tutor-card">
+          <div class="card-icon">🧑‍🏫</div>
+          <h3>Ask Tutor</h3>
+          <p>Interactive learning with personalized explanations, quizzes, and practice problems</p>
+          <button class="option-btn" id="open-tutor">Start Learning</button>
+        </div>
+        
+        <div class="option-card" id="summarizer-card">
+          <div class="card-icon">📄</div>
+          <h3>Summarizer</h3>
+          <p>Quickly summarize long texts, articles, or documents into key points</p>
+          <button class="option-btn" id="open-summarizer">Summarize Text</button>
+        </div>
+        
+        <div class="option-card" id="writer-card">
+          <div class="card-icon">✍️</div>
+          <h3>Writing Helper</h3>
+          <p>Improve your writing with grammar checks, style suggestions, and content ideas</p>
+          <button class="option-btn" id="open-writer">Get Writing Help</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <div id="main-interaction-area">
-    <div id="prompt-area">
-      <form>
+  <!-- Tutor Panel -->
+  <div id="tutor-panel" class="app-panel" style="display: none;">
+    <div class="panel-header">
+      <button class="back-btn" id="back-from-tutor">← Back to Main</button>
+      <h2>🧑‍🏫 AI Tutor</h2>
+      <button class="help-btn" id="tutor-help">❓ Help</button>
+    </div>
+    
+    <div id="learning-setup">
+      <div class="learning-controls">
+        <div class="control-group">
+          <label for="subject-select">Subject</label>
+          <select id="subject-select">
+            <option value="general">General Learning</option>
+            <option value="math">Mathematics</option>
+            <option value="science">Science</option>
+            <option value="language">Language Arts</option>
+            <option value="history">History</option>
+            <option value="programming">Programming</option>
+            <option value="physics">Physics</option>
+            <option value="chemistry">Chemistry</option>
+            <option value="biology">Biology</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="level-select">Level</label>
+          <select id="level-select">
+            <option value="beginner">Beginner</option>
+            <option value="intermediate">Intermediate</option>
+            <option value="advanced">Advanced</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="mode-select">Learning Mode</label>
+          <select id="mode-select">
+            <option value="tutor">🧑‍🏫 Tutor (Explain)</option>
+            <option value="quiz">📝 Quiz Me</option>
+            <option value="practice">💪 Practice Problems</option>
+            <option value="review">📚 Review & Summary</option>
+            <option value="flashcard">🗂️ Create Flashcards</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="focus-area">Focus Area (Optional)</label>
+          <input type="text" id="focus-area" placeholder="e.g., algebra, grammar, photosynthesis">
+        </div>
+      </div>
+    </div>
+
+    <div id="main-interaction-area">
+      <div id="prompt-area">
+        <form id="tutor-form">
+          <label>
+            Ask your question or describe what you'd like to learn
+            <textarea id="prompt-input"
+              placeholder="e.g., 'Explain photosynthesis' or 'Give me algebra practice problems'"></textarea>
+          </label>
+          <div class="button-group">
+            <button type="submit" id="submit-button">Ask Tutor</button>
+          </div>
+          <span id="cost" style="display: none;"></span>
+        </form>
+      </div>
+
+      <div class="learning-stats">
+        <h3>Learning Session</h3>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-label">Subject:</span>
+            <span id="current-subject">General</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Level:</span>
+            <span id="current-level">Beginner</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Mode:</span>
+            <span id="current-mode">Tutor</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Questions:</span>
+            <span id="question-count">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Study Time:</span>
+            <span id="study-time">0m</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Streak:</span>
+            <span id="learning-streak">0 days</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="conversation-section">
+      <h2>Learning Conversation</h2>
+      <div id="response-area"></div>
+      <div class="learning-tools">
+        <button id="new-lesson-button">🆕 New Lesson</button>
+        <button id="copy-notes-button">📋 Copy Notes</button>
+        <details class="advanced-options">
+          <summary>⚙️ Advanced Options</summary>
+          <div class="settings">
+            <label for="session-temperature">AI Creativity</label>
+            <input id="session-temperature" type="range" min="0" max="2" step="0.1" value="0.7">
+            <span id="temp-value">0.7</span>
+            <label for="response-length">Response Length</label>
+            <select id="response-length">
+              <option value="concise" selected>Concise</option>
+              <option value="detailed">Detailed</option>
+              <option value="comprehensive">Comprehensive</option>
+            </select>
+          </div>
+        </details>
+      </div>
+
+      <div id="problematic-area">
+        <h3>Issue Report:</h3>
+        <pre id="problem"></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summarizer Panel -->
+  <div id="summarizer-panel" class="app-panel" style="display: none;">
+    <div class="panel-header">
+      <button class="back-btn" id="back-from-summarizer">← Back to Main</button>
+      <h2>📄 Text Summarizer</h2>
+      <button class="help-btn" id="summarizer-help">❓ Help</button>
+    </div>
+    
+    <div class="summarizer-controls">
+      <div class="control-group">
+        <label for="summary-length">Summary Length</label>
+        <select id="summary-length">
+          <option value="brief">Brief (2-3 sentences)</option>
+          <option value="medium" selected>Medium (1 paragraph)</option>
+          <option value="detailed">Detailed (Multiple paragraphs)</option>
+        </select>
+      </div>
+      
+      <div class="control-group">
+        <label for="summary-style">Summary Style</label>
+        <select id="summary-style">
+          <option value="bullet">Bullet Points</option>
+          <option value="paragraph" selected>Paragraph</option>
+          <option value="outline">Outline Format</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="summarizer-input">
+      <form id="summarizer-form">
         <label>
-          Ask your question or describe what you'd like to learn
-          <textarea id="prompt-input"
-            placeholder="e.g., 'Explain photosynthesis' or 'Give me algebra practice problems'"></textarea>
+          Paste your text to summarize
+          <textarea id="text-input" placeholder="Paste your article, document, or long text here..."></textarea>
         </label>
         <div class="button-group">
-          <button type="submit" id="submit-button">Ask Tutor</button>
+          <button type="submit" id="summarize-button">📄 Summarize Text</button>
         </div>
-        <span id="cost" style="display: none;"></span>
       </form>
     </div>
 
-    <div class="learning-stats">
-      <h3>Learning Session</h3>
-      <div class="stats-grid">
-        <div class="stat-item">
-          <span class="stat-label">Subject:</span>
-          <span id="current-subject">General</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Level:</span>
-          <span id="current-level">Beginner</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Mode:</span>
-          <span id="current-mode">Tutor</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Questions:</span>
-          <span id="question-count">0</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Study Time:</span>
-          <span id="study-time">0m</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">Streak:</span>
-          <span id="learning-streak">0 days</span>
-        </div>
+    <div id="summary-section" style="display: none;">
+      <h2>Summary</h2>
+      <div id="summary-area"></div>
+      <div class="summary-tools">
+        <button id="copy-summary-button">📋 Copy Summary</button>
+        <button id="new-summary-button">🆕 New Summary</button>
       </div>
     </div>
   </div>
 
-  <div id="conversation-section">
-    <h2>Learning Conversation</h2>
-    <div id="response-area"></div>
-    <div class="learning-tools">
-      <button id="help-button">❓ Help</button>
-      <button id="new-lesson-button">🆕 New Lesson</button>
-      <button id="copy-notes-button">📋 Copy Notes</button>
-      <details class="advanced-options">
-        <summary>⚙️ Advanced Options</summary>
-        <div class="settings">
-          <label for="session-temperature">AI Creativity</label>
-          <input id="session-temperature" type="range" min="0" max="2" step="0.1" value="0.7">
-          <span id="temp-value">0.7</span>
-          <label for="response-length">Response Length</label>
-          <select id="response-length">
-            <option value="concise">Concise</option>
-            <option value="detailed" selected>Detailed</option>
-            <option value="comprehensive">Comprehensive</option>
-          </select>
-        </div>
-      </details>
+  <!-- Writing Helper Panel -->
+  <div id="writer-panel" class="app-panel" style="display: none;">
+    <div class="panel-header">
+      <button class="back-btn" id="back-from-writer">← Back to Main</button>
+      <h2>✍️ Writing Helper</h2>
+      <button class="help-btn" id="writer-help">❓ Help</button>
+    </div>
+    
+    <div class="writer-controls">
+      <div class="control-group">
+        <label for="writing-task">Writing Task</label>
+        <select id="writing-task">
+          <option value="improve">Improve Existing Text</option>
+          <option value="grammar">Grammar Check</option>
+          <option value="style">Style Enhancement</option>
+          <option value="ideas">Generate Ideas</option>
+          <option value="structure">Structure Help</option>
+        </select>
+      </div>
+      
+      <div class="control-group">
+        <label for="writing-type">Text Type</label>
+        <select id="writing-type">
+          <option value="general">General Writing</option>
+          <option value="academic">Academic Paper</option>
+          <option value="business">Business Email</option>
+          <option value="creative">Creative Writing</option>
+          <option value="technical">Technical Documentation</option>
+        </select>
+      </div>
     </div>
 
+    <div class="writer-input">
+      <form id="writer-form">
+        <label>
+          Enter your text or writing prompt
+          <textarea id="writing-input" placeholder="Paste your text for improvement, or describe what you want to write..."></textarea>
+        </label>
+        <div class="button-group">
+          <button type="submit" id="writing-button">✍️ Get Writing Help</button>
+        </div>
+      </form>
+    </div>
 
-
-    <div id="problematic-area">
-      <h3>Issue Report:</h3>
-      <pre id="problem"></pre>
+    <div id="writing-section" style="display: none;">
+      <h2>Writing Assistance</h2>
+      <div id="writing-area"></div>
+      <div class="writing-tools">
+        <button id="copy-writing-button">📋 Copy Result</button>
+        <button id="new-writing-button">🆕 New Request</button>
+      </div>
     </div>
   </div>
 
-  <!-- Welcome Modal -->
-  <div id="welcome-modal" class="modal welcome-modal">
+  <!-- Tutor Welcome Modal -->
+  <div id="tutor-welcome-modal" class="modal welcome-modal">
     <div class="modal-content welcome-content">
-      <span class="close" id="welcome-close">&times;</span>
+      <span class="close" id="tutor-welcome-close">&times;</span>
       <div class="welcome-header">
-        <h2>👋 Welcome to Learning Hub</h2>
+        <h2>🧑‍🏫 Welcome to AI Tutor</h2>
       </div>
       <div class="welcome-body">
         <h3>Ready to learn? Here's how to get started:</h3>
         <ul>
-          <li>🎯 <strong>Choose your subject and level</strong> above</li>
-          <li>💡 <strong>Use the learning controls</strong> to customize your experience</li>
+          <li>🎯 <strong>Choose your subject and level</strong> to customize your experience</li>
+          <li>💡 <strong>Select a learning mode</strong> - Tutor, Quiz, Practice, or Review</li>
           <li>❓ <strong>Ask any question</strong> - I'll adapt to your learning style</li>
-          <li>📚 <strong>Try different modes</strong> - Tutor, Quiz, Practice, or Review</li>
-          <li>🗂️ <strong>Create flashcards</strong> and bookmark important conversations</li>
+          <li>📚 <strong>Get explanations, practice problems, and quizzes</strong></li>
+          <li>🗂️ <strong>Create flashcards</strong> and track your progress</li>
         </ul>
-        <p><em>Everything works offline once set up - perfect for studying anywhere! 🌍</em></p>
+        <p><em>Interactive learning powered by AI - works completely offline! 🌍</em></p>
         <div class="welcome-actions">
-          <button id="welcome-start-button" class="welcome-btn">Let's Start Learning!</button>
+          <button id="tutor-welcome-start" class="welcome-btn">Let's Start Learning!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summarizer Welcome Modal -->
+  <div id="summarizer-welcome-modal" class="modal welcome-modal">
+    <div class="modal-content welcome-content">
+      <span class="close" id="summarizer-welcome-close">&times;</span>
+      <div class="welcome-header">
+        <h2>📄 Welcome to Text Summarizer</h2>
+      </div>
+      <div class="welcome-body">
+        <h3>Ready to summarize? Here's how it works:</h3>
+        <ul>
+          <li>📝 <strong>Paste any long text</strong> - articles, documents, research papers</li>
+          <li>⚙️ <strong>Choose summary length</strong> - brief, medium, or detailed</li>
+          <li>🎨 <strong>Select format</strong> - bullet points, paragraphs, or outline</li>
+          <li>⚡ <strong>Get instant summaries</strong> with key points highlighted</li>
+          <li>📋 <strong>Copy and use</strong> your summaries anywhere</li>
+        </ul>
+        <p><em>Turn lengthy content into digestible insights - powered by AI! 🚀</em></p>
+        <div class="welcome-actions">
+          <button id="summarizer-welcome-start" class="welcome-btn">Start Summarizing!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Writing Helper Welcome Modal -->
+  <div id="writer-welcome-modal" class="modal welcome-modal">
+    <div class="modal-content welcome-content">
+      <span class="close" id="writer-welcome-close">&times;</span>
+      <div class="welcome-header">
+        <h2>✍️ Welcome to Writing Helper</h2>
+      </div>
+      <div class="welcome-body">
+        <h3>Ready to improve your writing? Here's what I can do:</h3>
+        <ul>
+          <li>✏️ <strong>Grammar and spell check</strong> - fix errors instantly</li>
+          <li>🎨 <strong>Style enhancement</strong> - make your writing more engaging</li>
+          <li>💡 <strong>Generate ideas</strong> - overcome writer's block</li>
+          <li>📋 <strong>Structure help</strong> - organize your thoughts better</li>
+          <li>🎯 <strong>Adapt to any format</strong> - emails, essays, creative writing</li>
+        </ul>
+        <p><em>Your personal writing assistant - always ready to help! ✨</em></p>
+        <div class="welcome-actions">
+          <button id="writer-welcome-start" class="welcome-btn">Start Writing!</button>
         </div>
       </div>
     </div>
