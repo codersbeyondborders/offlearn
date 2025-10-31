@@ -34,21 +34,21 @@
       <h2>Choose Your AI Assistant</h2>
       <div class="option-cards">
         <div class="option-card" id="tutor-card">
-          <div class="card-icon">🧑‍🏫</div>
+          <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="75" height="75" viewBox="0 0 640 512"><path fill="#FFFFFF" d="M208 352c-2.39 0-4.78.35-7.06 1.09C187.98 357.3 174.35 360 160 360c-14.35 0-27.98-2.7-40.95-6.91c-2.28-.74-4.66-1.09-7.05-1.09C49.94 352-.33 402.48 0 464.62C.14 490.88 21.73 512 48 512h224c26.27 0 47.86-21.12 48-47.38c.33-62.14-49.94-112.62-112-112.62zm-48-32c53.02 0 96-42.98 96-96s-42.98-96-96-96s-96 42.98-96 96s42.98 96 96 96zM592 0H208c-26.47 0-48 22.25-48 49.59V96c23.42 0 45.1 6.78 64 17.8V64h352v288h-64v-64H384v64h-76.24c19.1 16.69 33.12 38.73 39.69 64H592c26.47 0 48-22.25 48-49.59V49.59C640 22.25 618.47 0 592 0z"/></svg></div>
           <h3>Ask Tutor</h3>
           <p>Interactive learning with personalized explanations, quizzes, and practice problems</p>
           <button class="option-btn" id="open-tutor">Start Learning</button>
         </div>
 
         <div class="option-card" id="summarizer-card">
-          <div class="card-icon">📄</div>
+          <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="75" height="75" viewBox="0 0 17 16" fill="#FFFFFF"><g fill="#FFFFFF" fill-rule="evenodd"><path d="M2 0v16h13V4.024L9 4V.062L2 0zm11 13H4v-1h9v1zm0-2H4v-1h9v1zm0-4v1H4V7h9z"/><path d="M10 0v2.844h4.752L10 0z"/></g></svg></div>
           <h3>Summarizer</h3>
           <p>Quickly summarize long texts, articles, or documents into key points or short paragraphs.</p>
           <button class="option-btn" id="open-summarizer">Summarize Text</button>
         </div>
 
         <div class="option-card" id="writer-card">
-          <div class="card-icon">✍️</div>
+          <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="75" height="75" viewBox="0 0 700 820"><path fill="#FFFFFF" d="M626 70q25 25 41 52t23 52t4 46t-17 36L389 544L288 646L0 696l51-287l101-102L440 19q14-14 36-17t47 4t52 23t51 41zM259 602q-12-20-30-44t-43-48t-48-43t-44-30L76 542q21 15 42.5 36.5T154 621z"/></svg></div>
           <h3>Writing Helper</h3>
           <p>Improve your writing with grammar checks, style suggestions, and content ideas</p>
           <button class="option-btn" id="open-writer">Get Writing Help</button>
@@ -61,10 +61,10 @@
   <div id="tutor-panel" class="app-panel" style="display: none;">
     <div class="panel-header">
       <button class="back-btn" id="back-from-tutor">← Back to Main</button>
-      <h2>🧑‍🏫 AI Tutor</h2>
+      <h2><svg xmlns="http://www.w3.org/2000/svg" width="75" height="75" viewBox="0 0 640 512"><path fill="#FFFFFF" d="M208 352c-2.39 0-4.78.35-7.06 1.09C187.98 357.3 174.35 360 160 360c-14.35 0-27.98-2.7-40.95-6.91c-2.28-.74-4.66-1.09-7.05-1.09C49.94 352-.33 402.48 0 464.62C.14 490.88 21.73 512 48 512h224c26.27 0 47.86-21.12 48-47.38c.33-62.14-49.94-112.62-112-112.62zm-48-32c53.02 0 96-42.98 96-96s-42.98-96-96-96s-96 42.98-96 96s42.98 96 96 96zM592 0H208c-26.47 0-48 22.25-48 49.59V96c23.42 0 45.1 6.78 64 17.8V64h352v288h-64v-64H384v64h-76.24c19.1 16.69 33.12 38.73 39.69 64H592c26.47 0 48-22.25 48-49.59V49.59C640 22.25 618.47 0 592 0z"/></svg> AI Tutor</h2>
       <div class="header-buttons">
         <details class="advanced-options">
-          <summary>⚙️ Advanced Options</summary>
+          <summary><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 416 432"><path fill="#FFFFFF" d="m366 237l45 35q7 6 3 14l-43 74q-4 8-13 4l-53-21q-18 13-36 21l-8 56q-1 9-11 9h-85q-9 0-11-9l-8-56q-19-8-36-21l-53 21q-9 3-13-4L1 286q-4-8 3-14l45-35q-1-12-1-21t1-21L4 160q-7-6-3-14l43-74q5-8 13-4l53 21q18-13 36-21l8-56q2-9 11-9h85q10 0 11 9l8 56q19 8 36 21l53-21q9-3 13 4l43 74q4 8-3 14l-45 35q2 12 2 21t-2 21zm-158.5 54q30.5 0 52.5-22t22-53t-22-53t-52.5-22t-52.5 22t-22 53t22 53t52.5 22z"/></svg> Advanced Options</summary>
           <div class="settings">
             <label for="session-temperature">AI Creativity</label>
             <input id="session-temperature" type="range" min="0" max="2" step="0.1" value="0.7">
@@ -76,7 +76,7 @@
             </select>
           </div>
         </details>
-        <button class="help-btn" id="tutor-help">❓ Help</button>
+        <button class="help-btn" id="tutor-help"><svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24"><path fill="#FFFFFF" d="M11.95 18q.525 0 .888-.363t.362-.887q0-.525-.362-.888t-.888-.362q-.525 0-.887.363t-.363.887q0 .525.363.888t.887.362Zm-.9-3.85h1.85q0-.825.188-1.3t1.062-1.3q.65-.65 1.025-1.238T15.55 8.9q0-1.4-1.025-2.15T12.1 6q-1.425 0-2.313.75T8.55 8.55l1.65.65q.125-.45.563-.975T12.1 7.7q.8 0 1.2.438t.4.962q0 .5-.3.938t-.75.812q-1.1.975-1.35 1.475t-.25 1.825ZM12 22q-2.075 0-3.9-.788t-3.175-2.137q-1.35-1.35-2.137-3.175T2 12q0-2.075.788-3.9t2.137-3.175q1.35-1.35 3.175-2.137T12 2q2.075 0 3.9.788t3.175 2.137q1.35 1.35 2.138 3.175T22 12q0 2.075-.788 3.9t-2.137 3.175q-1.35 1.35-3.175 2.138T12 22Z"/></svg> Help</button>
       </div>
     </div>
 
@@ -157,8 +157,8 @@
   <div id="summarizer-panel" class="app-panel" style="display: none;">
     <div class="panel-header">
       <button class="back-btn" id="back-from-summarizer">← Back to Main</button>
-      <h2>📄 Text Summarizer</h2>
-      <button class="help-btn" id="summarizer-help">❓ Help</button>
+      <h2><svg xmlns="http://www.w3.org/2000/svg" width="75" height="75" viewBox="0 0 17 16" fill="#FFFFFF"><g fill="#FFFFFF" fill-rule="evenodd"><path d="M2 0v16h13V4.024L9 4V.062L2 0zm11 13H4v-1h9v1zm0-2H4v-1h9v1zm0-4v1H4V7h9z"/><path d="M10 0v2.844h4.752L10 0z"/></g></svg>Text Summarizer</h2>
+      <button class="help-btn" id="summarizer-help"><svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24"><path fill="#FFFFFF" d="M11.95 18q.525 0 .888-.363t.362-.887q0-.525-.362-.888t-.888-.362q-.525 0-.887.363t-.363.887q0 .525.363.888t.887.362Zm-.9-3.85h1.85q0-.825.188-1.3t1.062-1.3q.65-.65 1.025-1.238T15.55 8.9q0-1.4-1.025-2.15T12.1 6q-1.425 0-2.313.75T8.55 8.55l1.65.65q.125-.45.563-.975T12.1 7.7q.8 0 1.2.438t.4.962q0 .5-.3.938t-.75.812q-1.1.975-1.35 1.475t-.25 1.825ZM12 22q-2.075 0-3.9-.788t-3.175-2.137q-1.35-1.35-2.137-3.175T2 12q0-2.075.788-3.9t2.137-3.175q1.35-1.35 3.175-2.137T12 2q2.075 0 3.9.788t3.175 2.137q1.35 1.35 2.138 3.175T22 12q0 2.075-.788 3.9t-2.137 3.175q-1.35 1.35-3.175 2.138T12 22Z"/></svg> Help</button>
     </div>
 
     <div class="summarizer-controls">
@@ -207,8 +207,8 @@
   <div id="writer-panel" class="app-panel" style="display: none;">
     <div class="panel-header">
       <button class="back-btn" id="back-from-writer">← Back to Main</button>
-      <h2>✍️ Writing Helper</h2>
-      <button class="help-btn" id="writer-help">❓ Help</button>
+      <h2><svg xmlns="http://www.w3.org/2000/svg" width="75" height="75" viewBox="0 0 700 820"><path fill="#FFFFFF" d="M626 70q25 25 41 52t23 52t4 46t-17 36L389 544L288 646L0 696l51-287l101-102L440 19q14-14 36-17t47 4t52 23t51 41zM259 602q-12-20-30-44t-43-48t-48-43t-44-30L76 542q21 15 42.5 36.5T154 621z"/></svg> Writing Helper</h2>
+      <button class="help-btn" id="writer-help"><svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24"><path fill="#FFFFFF" d="M11.95 18q.525 0 .888-.363t.362-.887q0-.525-.362-.888t-.888-.362q-.525 0-.887.363t-.363.887q0 .525.363.888t.887.362Zm-.9-3.85h1.85q0-.825.188-1.3t1.062-1.3q.65-.65 1.025-1.238T15.55 8.9q0-1.4-1.025-2.15T12.1 6q-1.425 0-2.313.75T8.55 8.55l1.65.65q.125-.45.563-.975T12.1 7.7q.8 0 1.2.438t.4.962q0 .5-.3.938t-.75.812q-1.1.975-1.35 1.475t-.25 1.825ZM12 22q-2.075 0-3.9-.788t-3.175-2.137q-1.35-1.35-2.137-3.175T2 12q0-2.075.788-3.9t2.137-3.175q1.35-1.35 3.175-2.137T12 2q2.075 0 3.9.788t3.175 2.137q1.35 1.35 2.138 3.175T22 12q0 2.075-.788 3.9t-2.137 3.175q-1.35 1.35-3.175 2.138T12 22Z"/></svg> Help</button>
     </div>
 
     <div class="writer-controls">
@@ -243,7 +243,7 @@
             placeholder="Paste your text for improvement, or describe what you want to write..."></textarea>
         </label>
         <div class="button-group">
-          <button type="submit" id="writing-button">✍️ Get Writing Help</button>
+          <button type="submit" id="writing-button">Get Writing Help</button>
         </div>
       </form>
     </div>
@@ -263,7 +263,7 @@
     <div class="modal-content welcome-content">
       <span class="close" id="tutor-welcome-close">&times;</span>
       <div class="welcome-header">
-        <h2>🧑‍🏫 Welcome to AI Tutor</h2>
+        <h2>Welcome to AI Tutor</h2>
       </div>
       <div class="welcome-body">
         <h3>Ready to learn? Here's how to get started:</h3>
@@ -285,7 +285,7 @@
     <div class="modal-content welcome-content">
       <span class="close" id="summarizer-welcome-close">&times;</span>
       <div class="welcome-header">
-        <h2>📄 Welcome to Text Summarizer</h2>
+        <h2>Welcome to Text Summarizer</h2>
       </div>
       <div class="welcome-body">
         <h3>Ready to summarize? Here's how it works:</h3>
@@ -309,7 +309,7 @@
     <div class="modal-content welcome-content">
       <span class="close" id="writer-welcome-close">&times;</span>
       <div class="welcome-header">
-        <h2>✍️ Welcome to Writing Helper</h2>
+        <h2>Welcome to Writing Helper</h2>
       </div>
       <div class="welcome-body">
         <h3>Ready to improve your writing? Here's what I can do:</h3>
